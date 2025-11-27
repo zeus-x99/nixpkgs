@@ -61,7 +61,8 @@ jobs:
         run: |
           branch="${{ steps.branch.outputs.branch }}"
           git checkout "$branch"
-          git merge "upstream/$branch" --ff-only
+          # 优先快进；若有本地额外提交则回退到常规合并，避免工作流失败
+          git merge "upstream/$branch" --ff-only || git merge "upstream/$branch" --no-edit
 
       - name: Push to origin
         if: steps.diff.outputs.noop != 'true'
