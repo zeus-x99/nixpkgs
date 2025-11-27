@@ -37,7 +37,10 @@ jobs:
 
       - name: Fast-forward default branch
         run: |
-          branch="${DEFAULT_BRANCH:-master}"
+          # github.event.repository.default_branch 在 schedule 事件中为空，
+          # fallback 使用 GITHUB_REF_NAME / GITHUB_REF 获取默认分支名称。
+          branch="${DEFAULT_BRANCH:-${GITHUB_REF_NAME:-${GITHUB_REF#refs/heads/}}}"
+          [ -n "$branch" ] || branch="master"
           git checkout "$branch"
           git merge "upstream/$branch" --ff-only
 
